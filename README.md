@@ -22,10 +22,10 @@ Sample app was initialized with the following commands:
 
 ```bash
 # Create the sample app directory
-mkdir -p sample-app
+mkdir -p idun-sample-app-js
 
 # Initialize a Next.js app with TypeScript, ESLint, Tailwind CSS, and app directory
-cd sample-app && npx create-next-app@latest . --typescript --eslint --tailwind --app --src-dir
+cd idun-sample-app-js && npx create-next-app@latest . --typescript --eslint --tailwind --app --src-dir
 ```
 
 ## Features
@@ -59,7 +59,7 @@ Since the app is created with Next.js, it is recommended to deploy the app using
 
 ### Environment Variables
 
-You can set up environment variables to customize the SDK configuration. For example, if you want to use the IDUN staging environment, you can create a `.env.local` file in the root of the sample-app directory to override them:
+You can set up environment variables to customize the SDK configuration. For example, if you want to use the IDUN staging environment, you can create a `.env.local` file in the root of the idun-sample-app-js directory to override them:
 
 ```
 # API Endpoints (optional - defaults to production environment)
@@ -97,8 +97,8 @@ These URI schemes must match your app's bundle identifier and must be configured
 1. Clone the repository
 
    ```
-   git clone <repository-url>
-   cd idun-guardian-sdk-js/sample-app
+   git clone https://github.com/iduntech/idun-sample-app-js.git
+   cd idun-sample-app-js
    ```
 
 2. Install dependencies

@@ -14,7 +14,6 @@ export default function Home() {
     const client = new Guardian();
     client.isRemoteDevice = true;
     setGuardianClient(client);
-
   }, []);
 
   const handleLogin = async () => {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Guardian } from "@iduntech/idun-guardian-sdk";
+import { StreamsTypes } from "@iduntech/idun-guardian-sdk";
 
 export default function Dashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,6 +15,7 @@ export default function Dashboard() {
   );
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isEEGStreaming, setIsEEGStreaming] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -43,6 +45,35 @@ export default function Dashboard() {
 
     checkAuth();
   }, [router]);
+
+  useEffect(() => {
+    if (!isEEGStreaming || !connectedEarbuds) return;
+
+    const handleSocketData = (data: any) => {
+      console.log("EEG Data received:", data);
+    };
+
+    const setupStream = async () => {
+      try {
+        // StreamsTypes.RAW_EEG is also an option if you need unfiltered data
+        // Handles subscription to the socket data
+        await connectedEarbuds.startRealtimeStream(StreamsTypes.FILTERED_EEG);
+
+        // Handles the data received from the socket
+        connectedEarbuds.listenToSocketData(handleSocketData);
+        console.log("EEG stream setup complete");
+      } catch (error) {
+        console.error("Error setting up EEG stream:", error);
+      }
+    };
+
+    setupStream();
+
+    return () => {
+      connectedEarbuds.stopRealtimeStream();
+      console.log("EEG stream stopped");
+    };
+  }, [isEEGStreaming, connectedEarbuds]);
 
   const handleLogout = async () => {
     try {
@@ -92,6 +123,27 @@ export default function Dashboard() {
     }
   };
 
+  const handleEEGStream = async () => {
+    if (!connectedEarbuds) return;
+
+    try {
+      if (!isEEGStreaming) {
+        // When Starting EEG Stream, a recording is created behind the scenes
+        await connectedEarbuds.startEEGStream();
+        setIsEEGStreaming(true);
+      } else {
+        // When Stopping EEG Stream, the recording is stopped
+        await connectedEarbuds.stopEEGStream();
+        setIsEEGStreaming(false);
+      }
+    } catch (error) {
+      console.error(
+        `Failed to ${isEEGStreaming ? "stop" : "start"} EEG stream:`,
+        error,
+      );
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -130,6 +182,12 @@ export default function Dashboard() {
                   <p className="text-sm mt-1">Battery Level: {batteryLevel}%</p>
                 )}
               </div>
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                onClick={handleEEGStream}
+              >
+                {isEEGStreaming ? "Stop EEG Stream" : "Start EEG Stream"}
+              </button>
               <button
                 className="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
                 onClick={handleDisconnectDevice}
